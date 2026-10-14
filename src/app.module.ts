@@ -9,9 +9,10 @@ import { ClockModule } from './common/clock.module';
 import { TimingInterceptor } from './common/interceptors/timing.interceptor';
 import { ResponseInterceptor } from './common/interceptors/response.interceptor';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
+import { LifecycleModule } from './lifecycle/lifecycle.module';
 
 @Module({
-  imports: [TasksModule, ReportsModule, ClockModule],
+  imports: [TasksModule, ReportsModule, ClockModule, LifecycleModule],
   controllers: [AppController],
   providers: [
     AppService,
