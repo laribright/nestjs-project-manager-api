@@ -1,0 +1,22 @@
+import { z } from 'zod';
+
+const envSchema = z.object({
+  PORT: z.coerce.number().int().min(1).max(65535).default(3000),
+  APP_NAME: z.string().trim().min(1).default('Project Manager API'),
+  TASK_DEFAULT_STATUS: z.enum(['todo', 'done']).default('todo'),
+  MAIL_FROM: z.string().trim().pipe(z.email()),
+});
+
+export function validateEnv(env: Record<string, unknown>) {
+  const result = envSchema.safeParse(env);
+
+  if (!result.success) {
+    const messages = result.error.issues
+      .map((issue) => `${issue.path.join('.')}: ${issue.message}`)
+      .join('\n');
+
+    throw new Error(`Invalid environment variables:\n${messages}`);
+  }
+
+  return { ...env, ...result.data };
+}

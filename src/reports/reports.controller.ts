@@ -9,4 +9,9 @@ export class ReportsController {
   summary() {
     return this.reportsService.summary();
   }
+
+  @Get('email-preview')
+  previewEmail() {
+    return this.reportsService.previewEmail();
+  }
 }

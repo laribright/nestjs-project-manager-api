@@ -1,4 +1,5 @@
 import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { TasksController } from './tasks.controller';
 import { TasksService } from './tasks.service';
 import {
@@ -19,7 +20,11 @@ import { RolesGuard } from '../common/guards/roles.guard';
     { provide: TasksService, useClass: TasksService },
     {
       provide: TASKS_OPTIONS,
-      useValue: { defaultStatus: 'todo' } as TasksOptions,
+      useFactory: (config: ConfigService): TasksOptions => ({
+        defaultStatus: config.getOrThrow('TASK_DEFAULT_STATUS'),
+      }),
+      // useValue: { defaultStatus: 'todo' } as TasksOptions,
+      inject: [ConfigService],
     },
     {
       provide: TASKS_LABEL,

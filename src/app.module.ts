@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
+import { ConfigModule } from '@nestjs/config';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -10,9 +11,22 @@ import { TimingInterceptor } from './common/interceptors/timing.interceptor';
 import { ResponseInterceptor } from './common/interceptors/response.interceptor';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 import { LifecycleModule } from './lifecycle/lifecycle.module';
+import { validateEnv } from './config/validate-env';
+import appConfig from './config/app.config';
 
 @Module({
-  imports: [TasksModule, ReportsModule, ClockModule, LifecycleModule],
+  imports: [
+    TasksModule,
+    ReportsModule,
+    ClockModule,
+    LifecycleModule,
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: '.env',
+      validate: validateEnv,
+      load: [appConfig],
+    }),
+  ],
   controllers: [AppController],
   providers: [
     AppService,
