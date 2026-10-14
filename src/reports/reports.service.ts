@@ -13,7 +13,6 @@ export class ReportsService {
 
   async summary() {
     const tasks = await this.tasksService.findAll();
-
     return {
       total: tasks.length,
       completed: tasks.filter((task) => task.status === 'done').length,

@@ -1,9 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { asc, eq } from 'drizzle-orm';
+import { asc, count, eq, ilike, SQL, and, desc } from 'drizzle-orm';
 
 import { DatabaseService } from '../database/database.service';
 import { TaskRow, tasks } from '../database/schema';
 import { taskEvents } from '../database/schema';
+import { ListTasksDto } from './dto/list-tasks.dto';
 
 @Injectable()
 export class TasksRepository {
@@ -78,5 +79,42 @@ export class TasksRepository {
       .returning();
 
     return task;
+  }
+
+  async list(query: ListTasksDto) {
+    const { page, limit, status, sortBy, sortOrder } = query;
+    const offset = (page - 1) * limit;
+    const search = query.search?.trim();
+    const filter: SQL[] = [];
+
+    if (status) filter.push(eq(tasks.status, status));
+    if (search) filter.push(ilike(tasks.title, `%${search}%`));
+
+    const where = filter.length > 0 ? and(...filter) : undefined;
+    const column = sortBy === 'title' ? tasks.title : tasks.id;
+    const direction = sortOrder === 'desc' ? desc : asc;
+
+    const items = await this.database.db
+      .select()
+      .from(tasks)
+      .where(where)
+      .orderBy(direction(column), direction(tasks.id))
+      .limit(limit)
+      .offset(offset);
+
+    const [result] = await this.database.db
+      .select({ total: count() })
+      .from(tasks)
+      .where(where);
+
+    return {
+      items,
+      meta: {
+        page,
+        limit,
+        total: result.total,
+        totalPages: Math.ceil(result.total / limit),
+      },
+    };
   }
 }

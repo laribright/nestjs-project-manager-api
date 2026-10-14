@@ -5,6 +5,7 @@ import { UpdateTasksDto } from './dto/update-tasks.dto';
 import { TASKS_OPTIONS, type TasksOptions } from './tasks.constants';
 import { TasksRepository } from './tasks.repository';
 import { TaskRow } from '../database/schema';
+import { ListTasksDto } from './dto/list-tasks.dto';
 
 @Injectable()
 export class TasksService {
@@ -35,7 +36,11 @@ export class TasksService {
     );
   }
 
-  findAll(): Promise<TaskRow[]> {
+  list(query: ListTasksDto) {
+    return this.tasksRepository.list(query);
+  }
+
+  findAll() {
     return this.tasksRepository.findAll();
   }
 

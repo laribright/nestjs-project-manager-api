@@ -9,7 +9,16 @@ import {
   Delete,
   Inject,
   UseGuards,
+  Query,
 } from '@nestjs/common';
+import {
+  ApiBearerAuth,
+  ApiTags,
+  ApiOperation,
+  ApiOkResponse,
+  ApiBadRequestResponse,
+} from '@nestjs/swagger';
+
 import { TasksService } from './tasks.service';
 import { CreateTasksDto } from './dto/create-tasks.dto';
 import { UpdateTasksDto } from './dto/update-tasks.dto';
@@ -19,8 +28,12 @@ import { RolesGuard } from '../common/guards/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import type { DemoUser } from '../common/types/authenticated-request';
+import { ListTasksDto } from './dto/list-tasks.dto';
+import { TasksPageResponseDto } from './dto/tasks-response.dto';
 
-@Controller('tasks')
+@ApiTags('Tasks')
+@ApiBearerAuth()
+@Controller({ path: 'tasks', version: '1' })
 @UseGuards(DemoAuthGuard, RolesGuard)
 export class TasksController {
   constructor(
@@ -35,9 +48,56 @@ export class TasksController {
     );
   }
 
+  // This was the old way of doing it, now we use the DTOs
+  // @ApiOkResponse({
+  //   description: 'A page of tasks inside data object',
+  //   schema: {
+  //     type: 'object',
+  //     required: ['data'],
+  //     properties: {
+  //       data: {
+  //         type: 'object',
+  //         required: ['items', 'meta'],
+  //         properties: {
+  //           items: {
+  //             type: 'array',
+  //             items: {
+  //               type: 'object',
+  //               required: ['id', 'title', 'status'],
+  //               properties: {
+  //                 id: { type: 'integer', example: 1 },
+  //                 title: { type: 'string', example: 'Buy groceries' },
+  //                 status: { type: 'string', example: 'todo' },
+  //               },
+  //             },
+  //           },
+  //           meta: {
+  //             type: 'object',
+  //             required: ['total', 'page', 'limit', 'totalPages'],
+  //             properties: {
+  //               total: { type: 'integer', example: 100 },
+  //               page: { type: 'integer', example: 1 },
+  //               limit: { type: 'integer', example: 10 },
+  //               totalPages: { type: 'integer', example: 10 },
+  //             },
+  //           },
+  //         },
+  //       },
+  //     },
+  //   },
+  // })
   @Get()
-  findAll() {
-    return this.tasksService.findAll();
+  @ApiOperation({
+    summary: 'List tasks with pagination, filtering and sorting',
+  })
+  @ApiOkResponse({
+    description: 'A page of tasks inside data object',
+    type: TasksPageResponseDto,
+  })
+  @ApiBadRequestResponse({ description: 'Bad Request' })
+  findAll(@Query() query: ListTasksDto) {
+    // orderBy, limit, offset
+    return this.tasksService.list(query);
   }
 
   @Post()

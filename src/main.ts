@@ -1,6 +1,8 @@
 import { NestFactory } from '@nestjs/core';
-import { ValidationPipe } from '@nestjs/common';
+import { ValidationPipe, VersioningType } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { VERSION_NEUTRAL } from '@nestjs/common';
 
 import { AppModule } from './app.module';
 
@@ -23,6 +25,25 @@ async function bootstrap() {
   //     console.error(error);
   //   });
   // }, 10000);
+
+  // This is a way of adding a global prefix to all routes
+  // app.setGlobalPrefix('api');
+
+  app.enableVersioning({
+    type: VersioningType.URI,
+    defaultVersion: VERSION_NEUTRAL, // Keep other existing controllers unversioned
+  });
+
+  const swaggerConfig = new DocumentBuilder()
+    .setTitle('Project Manager API')
+    .setDescription('API for the Project Manager application')
+    .setVersion('1.0')
+    .addBearerAuth()
+    .build();
+
+  const document = SwaggerModule.createDocument(app, swaggerConfig);
+  SwaggerModule.setup('docs', app, document);
+
   await app.listen(port);
   const appName = configService.getOrThrow<string>('app.name');
   console.log(`${appName} is running on: PORT:${port}`);
