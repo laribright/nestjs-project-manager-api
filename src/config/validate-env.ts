@@ -5,6 +5,15 @@ const envSchema = z.object({
   APP_NAME: z.string().trim().min(1).default('Project Manager API'),
   TASK_DEFAULT_STATUS: z.enum(['todo', 'done']).default('todo'),
   MAIL_FROM: z.string().trim().pipe(z.email()),
+  DATABASE_URL: z
+    .url()
+    .refine(
+      (value) =>
+        ['postgresql', 'postgresql:'].includes(new URL(value).protocol),
+      {
+        message: 'DATABASE_URL must be a valid PostgreSQL URL',
+      },
+    ),
 });
 
 export function validateEnv(env: Record<string, unknown>) {

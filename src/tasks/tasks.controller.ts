@@ -62,4 +62,14 @@ export class TasksController {
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.tasksService.remove(id);
   }
+
+  @Patch(':id/complete')
+  complete(@Param('id', ParseIntPipe) id: number) {
+    return this.tasksService.complete(id);
+  }
+
+  @Get(':id/history')
+  history(@Param('id', ParseIntPipe) id: number) {
+    return this.tasksService.history(id);
+  }
 }

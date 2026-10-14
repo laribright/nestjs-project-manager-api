@@ -11,11 +11,15 @@ import {
 import { RequestLoggerMiddlware } from '../common/middleware/request-logger.middleware';
 import { DemoAuthGuard } from '../common/guards/demo-auth-guard';
 import { RolesGuard } from '../common/guards/roles.guard';
+import { DatabaseModule } from '../database/database.module';
+import { TasksRepository } from './tasks.repository';
 
 @Module({
+  imports: [DatabaseModule],
   controllers: [TasksController],
   providers: [
     DemoAuthGuard,
+    TasksRepository,
     RolesGuard,
     { provide: TasksService, useClass: TasksService },
     {
