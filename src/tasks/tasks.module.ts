@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
 import { TasksController } from './tasks.controller';
 import { TasksService } from './tasks.service';
 import {
@@ -7,10 +7,15 @@ import {
   TASKS_LABEL,
   TASKS_SERVICE_ALIAS,
 } from './tasks.constants';
+import { RequestLoggerMiddlware } from '../common/middleware/request-logger.middleware';
+import { DemoAuthGuard } from '../common/guards/demo-auth-guard';
+import { RolesGuard } from '../common/guards/roles.guard';
 
 @Module({
   controllers: [TasksController],
   providers: [
+    DemoAuthGuard,
+    RolesGuard,
     { provide: TasksService, useClass: TasksService },
     {
       provide: TASKS_OPTIONS,
@@ -27,7 +32,10 @@ import {
       useExisting: TasksService,
     },
   ],
-  // providers: [TasksService],
   exports: [TasksService],
 })
-export class TasksModule {}
+export class TasksModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(RequestLoggerMiddlware).forRoutes(TasksController);
+  }
+}
