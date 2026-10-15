@@ -13,9 +13,10 @@ import { DemoAuthGuard } from '../common/guards/demo-auth-guard';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { DatabaseModule } from '../database/database.module';
 import { TasksRepository } from './tasks.repository';
+import { AuthModule } from '../auth/auth.module';
 
 @Module({
-  imports: [DatabaseModule],
+  imports: [DatabaseModule, AuthModule],
   controllers: [TasksController],
   providers: [
     DemoAuthGuard,

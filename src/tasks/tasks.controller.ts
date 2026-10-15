@@ -23,18 +23,18 @@ import { TasksService } from './tasks.service';
 import { CreateTasksDto } from './dto/create-tasks.dto';
 import { UpdateTasksDto } from './dto/update-tasks.dto';
 import { TASKS_LABEL, TASKS_SERVICE_ALIAS } from './tasks.constants';
-import { DemoAuthGuard } from '../common/guards/demo-auth-guard';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
-import type { DemoUser } from '../common/types/authenticated-request';
+import type { AuthUser } from '../common/types/authenticated-request';
 import { ListTasksDto } from './dto/list-tasks.dto';
 import { TasksPageResponseDto } from './dto/tasks-response.dto';
+import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 
 @ApiTags('Tasks')
 @ApiBearerAuth()
 @Controller({ path: 'tasks', version: '1' })
-@UseGuards(DemoAuthGuard, RolesGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
 export class TasksController {
   constructor(
     private readonly tasksService: TasksService,
@@ -95,41 +95,54 @@ export class TasksController {
     type: TasksPageResponseDto,
   })
   @ApiBadRequestResponse({ description: 'Bad Request' })
-  findAll(@Query() query: ListTasksDto) {
+  findAll(@Query() query: ListTasksDto, @CurrentUser() user: AuthUser) {
     // orderBy, limit, offset
-    return this.tasksService.list(query);
+    return this.tasksService.list(query, user.id);
   }
 
   @Post()
-  @Roles('admin')
-  create(@Body() dto: CreateTasksDto, @CurrentUser() user: DemoUser) {
+  create(@Body() dto: CreateTasksDto, @CurrentUser() user: AuthUser) {
     console.log('TASK CONTROLLER: create');
     console.log('[Current user]:', user);
-    return this.tasksService.create(dto);
+    return this.tasksService.create(dto, user.id);
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.tasksService.findOne(id);
+  findOne(
+    @Param('id', ParseIntPipe) id: number,
+    @CurrentUser() user: AuthUser,
+  ) {
+    return this.tasksService.findOne(id, user.id);
   }
 
   @Patch(':id')
-  update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateTasksDto) {
-    return this.tasksService.update(id, dto);
+  update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: UpdateTasksDto,
+    @CurrentUser() user: AuthUser,
+  ) {
+    return this.tasksService.update(id, dto, user.id);
   }
 
   @Delete(':id')
+  @Roles('admin')
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.tasksService.remove(id);
   }
 
   @Patch(':id/complete')
-  complete(@Param('id', ParseIntPipe) id: number) {
-    return this.tasksService.complete(id);
+  complete(
+    @Param('id', ParseIntPipe) id: number,
+    @CurrentUser() user: AuthUser,
+  ) {
+    return this.tasksService.complete(id, user.id);
   }
 
   @Get(':id/history')
-  history(@Param('id', ParseIntPipe) id: number) {
-    return this.tasksService.history(id);
+  history(
+    @Param('id', ParseIntPipe) id: number,
+    @CurrentUser() user: AuthUser,
+  ) {
+    return this.tasksService.history(id, user.id);
   }
 }

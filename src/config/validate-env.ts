@@ -14,6 +14,7 @@ const envSchema = z.object({
         message: 'DATABASE_URL must be a valid PostgreSQL URL',
       },
     ),
+  JWT_ACCESS_SECRET: z.string().trim().min(64),
 });
 
 export function validateEnv(env: Record<string, unknown>) {

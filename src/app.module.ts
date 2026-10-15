@@ -13,10 +13,12 @@ import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 import { LifecycleModule } from './lifecycle/lifecycle.module';
 import { validateEnv } from './config/validate-env';
 import appConfig from './config/app.config';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
     TasksModule,
+    AuthModule,
     ReportsModule,
     ClockModule,
     LifecycleModule,

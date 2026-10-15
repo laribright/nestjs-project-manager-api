@@ -13,21 +13,21 @@ export class DemoAuthGuard implements CanActivate {
     const request = context.switchToHttp().getRequest<AuthenticatedRequest>();
     const credential = request.headers.authorization;
 
-    if (credential === 'Bearer demo-admin') {
-      request.user = {
-        id: 1,
-        role: 'admin',
-      };
-      return true;
-    }
+    // if (credential === 'Bearer demo-admin') {
+    //   request.user = {
+    //     id: 1,
+    //     role: 'admin',
+    //   };
+    //   return true;
+    // }
 
-    if (credential === 'Bearer demo-member') {
-      request.user = {
-        id: 2,
-        role: 'member',
-      };
-      return true;
-    }
+    // if (credential === 'Bearer demo-member') {
+    //   request.user = {
+    //     id: 2,
+    //     role: 'member',
+    //   };
+    //   return true;
+    // }
 
     throw new UnauthorizedException('Invalid credential');
   }

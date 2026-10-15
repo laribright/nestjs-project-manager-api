@@ -15,6 +15,27 @@
       "when": 1791638536093,
       "tag": "0001_lush_black_tarantula",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1791995132749,
+      "tag": "0002_free_zarda",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1792066614328,
+      "tag": "0003_cloudy_skullbuster",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1792069347011,
+      "tag": "0004_careless_micromacro",
+      "breakpoints": true
     }
   ]
 }

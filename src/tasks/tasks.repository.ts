@@ -10,12 +10,15 @@ import { ListTasksDto } from './dto/list-tasks.dto';
 export class TasksRepository {
   constructor(private readonly database: DatabaseService) {}
 
-  async completeWithHistory(id: number): Promise<TaskRow | undefined> {
+  async completeWithHistory(
+    id: number,
+    ownerId: number,
+  ): Promise<TaskRow | undefined> {
     return this.database.db.transaction(async (tx) => {
       const [task] = await tx
         .update(tasks)
         .set({ status: 'done' })
-        .where(eq(tasks.id, id))
+        .where(and(eq(tasks.id, id), eq(tasks.ownerId, ownerId)))
         .returning();
 
       if (!task) return undefined;
@@ -29,32 +32,47 @@ export class TasksRepository {
     });
   }
 
-  history(id: number) {
+  history(id: number, ownerId: number) {
     return this.database.db
-      .select()
+      .select({
+        id: taskEvents.id,
+        taskId: taskEvents.taskId,
+        message: taskEvents.message,
+        createdAt: taskEvents.createdAt,
+      })
       .from(taskEvents)
-      .where(eq(taskEvents.taskId, id))
+      .innerJoin(tasks, eq(tasks.id, taskEvents.taskId))
+      .where(and(eq(tasks.id, id), eq(tasks.ownerId, ownerId)))
       .orderBy(asc(taskEvents.id));
   }
 
-  async create(title: string, status: TaskRow['status']): Promise<TaskRow> {
+  async create(
+    title: string,
+    status: TaskRow['status'],
+    ownerId: number,
+  ): Promise<TaskRow> {
     const [task] = await this.database.db
       .insert(tasks)
-      .values({ title, status })
+      .values({ title, status, ownerId })
       .returning();
 
     return task;
   }
 
-  async findAll(): Promise<TaskRow[]> {
-    return this.database.db.select().from(tasks).orderBy(asc(tasks.id));
+  async findAll(ownerId: number): Promise<TaskRow[]> {
+    return this.database.db
+      .select()
+      .from(tasks)
+      .where(eq(tasks.ownerId, ownerId))
+      .orderBy(asc(tasks.id));
   }
 
-  async findOne(id: number): Promise<TaskRow | undefined> {
+  async findOne(id: number, ownerId: number): Promise<TaskRow | undefined> {
     const [task] = await this.database.db
       .select()
       .from(tasks)
-      .where(eq(tasks.id, id));
+      .where(and(eq(tasks.id, id), eq(tasks.ownerId, ownerId)))
+      .limit(1);
 
     return task;
   }
@@ -62,11 +80,12 @@ export class TasksRepository {
   async update(
     id: number,
     changes: Partial<Pick<TaskRow, 'title' | 'status'>>,
+    ownerId: number,
   ): Promise<TaskRow | undefined> {
     const [task] = await this.database.db
       .update(tasks)
       .set(changes)
-      .where(eq(tasks.id, id))
+      .where(and(eq(tasks.id, id), eq(tasks.ownerId, ownerId)))
       .returning();
 
     return task;
@@ -81,16 +100,16 @@ export class TasksRepository {
     return task;
   }
 
-  async list(query: ListTasksDto) {
+  async list(query: ListTasksDto, ownerId: number) {
     const { page, limit, status, sortBy, sortOrder } = query;
     const offset = (page - 1) * limit;
     const search = query.search?.trim();
-    const filter: SQL[] = [];
+    const filters: SQL[] = [eq(tasks.ownerId, ownerId)];
 
-    if (status) filter.push(eq(tasks.status, status));
-    if (search) filter.push(ilike(tasks.title, `%${search}%`));
+    if (status) filters.push(eq(tasks.status, status));
+    if (search) filters.push(ilike(tasks.title, `%${search}%`));
 
-    const where = filter.length > 0 ? and(...filter) : undefined;
+    const where = filters.length > 0 ? and(...filters) : undefined;
     const column = sortBy === 'title' ? tasks.title : tasks.id;
     const direction = sortOrder === 'desc' ? desc : asc;
 

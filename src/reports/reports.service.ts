@@ -11,8 +11,8 @@ export class ReportsService {
     private readonly mailService: MailService,
   ) {}
 
-  async summary() {
-    const tasks = await this.tasksService.findAll();
+  async summary(ownerId: number) {
+    const tasks = await this.tasksService.findAll(ownerId);
     return {
       total: tasks.length,
       completed: tasks.filter((task) => task.status === 'done').length,

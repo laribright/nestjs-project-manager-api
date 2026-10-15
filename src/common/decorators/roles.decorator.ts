@@ -1,6 +1,6 @@
 import { SetMetadata } from '@nestjs/common';
-import { DemoUser } from '../types/authenticated-request';
+import { AuthUser } from '../types/authenticated-request';
 
 export const ROLES_KEY = 'roles';
-export const Roles = (...roles: DemoUser['role'][]) =>
+export const Roles = (...roles: AuthUser['role'][]) =>
   SetMetadata(ROLES_KEY, roles);

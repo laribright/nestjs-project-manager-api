@@ -14,8 +14,8 @@ export class TasksService {
     private readonly tasksRepository: TasksRepository,
   ) {}
 
-  async complete(id: number): Promise<TaskRow> {
-    const task = await this.tasksRepository.completeWithHistory(id);
+  async complete(id: number, ownerId: number): Promise<TaskRow> {
+    const task = await this.tasksRepository.completeWithHistory(id, ownerId);
 
     if (!task) {
       throw new NotFoundException('Task not found');
@@ -24,28 +24,29 @@ export class TasksService {
     return task;
   }
 
-  async history(id: number) {
-    await this.findOne(id);
-    return this.tasksRepository.history(id);
+  async history(id: number, ownerId: number) {
+    await this.findOne(id, ownerId);
+    return this.tasksRepository.history(id, ownerId);
   }
 
-  create(dto: CreateTasksDto) {
+  create(dto: CreateTasksDto, ownerId: number) {
     return this.tasksRepository.create(
       dto.title,
       this.options.defaultStatus,
+      ownerId,
     );
   }
 
-  list(query: ListTasksDto) {
-    return this.tasksRepository.list(query);
+  list(query: ListTasksDto, ownerId: number) {
+    return this.tasksRepository.list(query, ownerId);
   }
 
-  findAll() {
-    return this.tasksRepository.findAll();
+  async findAll(ownerId: number) {
+    return this.tasksRepository.findAll(ownerId);
   }
 
-  async findOne(id: number): Promise<TaskRow | undefined> {
-    const task = await this.tasksRepository.findOne(id);
+  async findOne(id: number, ownerId: number): Promise<TaskRow | undefined> {
+    const task = await this.tasksRepository.findOne(id, ownerId);
 
     if (!task) {
       throw new NotFoundException('Task not found');
@@ -54,15 +55,19 @@ export class TasksService {
     return task;
   }
 
-  async update(id: number, dto: UpdateTasksDto): Promise<TaskRow | undefined> {
+  async update(
+    id: number,
+    dto: UpdateTasksDto,
+    ownerId: number,
+  ): Promise<TaskRow | undefined> {
     const changes: Partial<Pick<TaskRow, 'title' | 'status'>> = {};
 
     if (dto.title !== undefined) changes.title = dto.title;
     if (dto.status !== undefined) changes.status = dto.status;
 
-    if (Object.keys(changes).length === 0) return this.findOne(id);
+    if (Object.keys(changes).length === 0) return this.findOne(id, ownerId);
 
-    const task = await this.tasksRepository.update(id, changes);
+    const task = await this.tasksRepository.update(id, changes, ownerId);
 
     if (!task) {
       throw new NotFoundException('Task not found');
