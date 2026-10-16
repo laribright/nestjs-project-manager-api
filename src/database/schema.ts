@@ -7,6 +7,7 @@ import {
   timestamp,
   varchar,
   uuid,
+  primaryKey,
 } from 'drizzle-orm/pg-core';
 
 export const taskStatus = pgEnum('task_status', ['todo', 'done']);
@@ -54,3 +55,39 @@ export const refreshSesssions = pgTable('refresh_sessions', {
   tokenHash: text('token_hash').notNull(),
   expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
 });
+
+export const workspaceRole = pgEnum('workspace_role', ['owner', 'member']);
+
+export const workspaces = pgTable('workspaces', {
+  id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
+  name: varchar('name', { length: 100 }).notNull(),
+});
+
+export const workspaceMembers = pgTable(
+  'workspace_members',
+  {
+    workspaceId: integer('workspace_id')
+      .notNull()
+      .references(() => workspaces.id, { onDelete: 'cascade' }),
+    userId: integer('user_id')
+      .notNull()
+      .references(() => users.id),
+    role: workspaceRole('role').notNull().default('member'),
+  },
+  (table) => [
+    primaryKey({ columns: [table.workspaceId, table.userId] }),
+    index('workspace_members_user_idx').on(table.userId),
+  ],
+);
+
+export const projects = pgTable(
+  'projects',
+  {
+    id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
+    workspaceId: integer('workspace_id')
+      .notNull()
+      .references(() => workspaces.id, { onDelete: 'cascade' }),
+    name: varchar('name', { length: 100 }).notNull(),
+  },
+  (table) => [index('projects_workspace_idx').on(table.workspaceId)],
+);

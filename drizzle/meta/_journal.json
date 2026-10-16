@@ -36,6 +36,20 @@
       "when": 1792069347011,
       "tag": "0004_careless_micromacro",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1792188986376,
+      "tag": "0005_sleepy_thunderbolt",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1792193206616,
+      "tag": "0006_marvelous_thor",
+      "breakpoints": true
     }
   ]
 }

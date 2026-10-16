@@ -14,10 +14,12 @@ import { LifecycleModule } from './lifecycle/lifecycle.module';
 import { validateEnv } from './config/validate-env';
 import appConfig from './config/app.config';
 import { AuthModule } from './auth/auth.module';
+import { WorkspaceModule } from './workspaces/workspace.module';
 
 @Module({
   imports: [
     TasksModule,
+    WorkspaceModule,
     AuthModule,
     ReportsModule,
     ClockModule,
