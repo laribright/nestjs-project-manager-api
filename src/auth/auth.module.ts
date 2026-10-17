@@ -7,6 +7,7 @@ import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { DatabaseModule } from '../database/database.module';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
+// import { SessionCleanupService } from './session-cleanup.service';
 
 @Module({
   imports: [
@@ -30,7 +31,7 @@ import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, AuthRepository, JwtAuthGuard],
+  providers: [AuthService, AuthRepository, JwtAuthGuard], // SessionCleanupService],
   exports: [AuthService],
 })
 export class AuthModule {}

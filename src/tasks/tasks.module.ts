@@ -1,5 +1,7 @@
 import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { BullModule } from '@nestjs/bullmq';
+
 import { TasksController } from './tasks.controller';
 import { TasksService } from './tasks.service';
 import {
@@ -14,11 +16,21 @@ import { RolesGuard } from '../common/guards/roles.guard';
 import { DatabaseModule } from '../database/database.module';
 import { TasksRepository } from './tasks.repository';
 import { AuthModule } from '../auth/auth.module';
+import { TasksEventsListener } from './tasks-events.listener';
+import { TasksNotificationsProcessor } from './tasks-notifications.processor';
 
 @Module({
-  imports: [DatabaseModule, AuthModule],
+  imports: [
+    DatabaseModule,
+    AuthModule,
+    BullModule.registerQueue({
+      name: 'task-notification',
+    }),
+  ],
   controllers: [TasksController],
   providers: [
+    TasksEventsListener,
+    TasksNotificationsProcessor,
     DemoAuthGuard,
     TasksRepository,
     RolesGuard,

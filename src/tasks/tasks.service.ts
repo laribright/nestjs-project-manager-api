@@ -1,4 +1,5 @@
 import { Injectable, NotFoundException, Inject } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 import { CreateTasksDto } from './dto/create-tasks.dto';
 import { UpdateTasksDto } from './dto/update-tasks.dto';
@@ -6,12 +7,14 @@ import { TASKS_OPTIONS, type TasksOptions } from './tasks.constants';
 import { TasksRepository } from './tasks.repository';
 import { TaskRow } from '../database/schema';
 import { ListTasksDto } from './dto/list-tasks.dto';
+import { TaskCreatedEvent } from './task-created.event';
 
 @Injectable()
 export class TasksService {
   constructor(
     @Inject(TASKS_OPTIONS) private readonly options: TasksOptions,
     private readonly tasksRepository: TasksRepository,
+    private readonly events: EventEmitter2,
   ) {}
 
   async complete(id: number, ownerId: number): Promise<TaskRow> {
@@ -29,12 +32,19 @@ export class TasksService {
     return this.tasksRepository.history(id, ownerId);
   }
 
-  create(dto: CreateTasksDto, ownerId: number) {
-    return this.tasksRepository.create(
+  async create(dto: CreateTasksDto, ownerId: number) {
+    const task = await this.tasksRepository.create(
       dto.title,
       this.options.defaultStatus,
       ownerId,
     );
+
+    await this.events.emitAsync(
+      'task.created',
+      new TaskCreatedEvent(task.id, ownerId),
+    );
+
+    return task;
   }
 
   list(query: ListTasksDto, ownerId: number) {

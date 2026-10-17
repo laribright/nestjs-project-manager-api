@@ -15,6 +15,9 @@ const envSchema = z.object({
       },
     ),
   JWT_ACCESS_SECRET: z.string().trim().min(64),
+  UPSTASH_REDIS_HOST: z.string().trim().min(1),
+  UPSTASH_REDIS_PORT: z.coerce.number().int().min(1).max(65535).default(6379),
+  UPSTASH_REDIS_PASSWORD: z.string().min(1),
 });
 
 export function validateEnv(env: Record<string, unknown>) {

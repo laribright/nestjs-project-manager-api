@@ -1,6 +1,9 @@
 import { Module } from '@nestjs/common';
 import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { EventEmitterModule } from '@nestjs/event-emitter';
+import { BullModule } from '@nestjs/bullmq';
+import { ScheduleModule } from '@nestjs/schedule';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -18,6 +21,19 @@ import { WorkspaceModule } from './workspaces/workspace.module';
 
 @Module({
   imports: [
+    ScheduleModule.forRoot(),
+    EventEmitterModule.forRoot(),
+    BullModule.forRootAsync({
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        connection: {
+          host: configService.get('UPSTASH_REDIS_HOST'),
+          port: configService.get('UPSTASH_REDIS_PORT'),
+          password: configService.get('UPSTASH_REDIS_PASSWORD'),
+          tls: {},
+        },
+      }),
+    }),
     TasksModule,
     WorkspaceModule,
     AuthModule,
