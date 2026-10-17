@@ -18,6 +18,7 @@ import { TasksRepository } from './tasks.repository';
 import { AuthModule } from '../auth/auth.module';
 import { TasksEventsListener } from './tasks-events.listener';
 import { TasksNotificationsProcessor } from './tasks-notifications.processor';
+import { TasksGateway } from './tasks.gateway';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { TasksNotificationsProcessor } from './tasks-notifications.processor';
   ],
   controllers: [TasksController],
   providers: [
+    TasksGateway,
     TasksEventsListener,
     TasksNotificationsProcessor,
     DemoAuthGuard,
