@@ -12,6 +12,11 @@ async function bootstrap() {
 
   const port = configService.getOrThrow<number>('app.port');
 
+  app.enableCors({
+    origin: ['http://localhost:4200'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+  });
+
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
