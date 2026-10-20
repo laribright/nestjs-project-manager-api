@@ -1,114 +1,137 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# NestJS Project Manager API
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+Companion repo for the **NestJS Complete Course** — a project-manager API built with NestJS, Drizzle ORM, PostgreSQL, JWT auth, BullMQ, scheduling, and WebSockets.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Course on Udemy
 
-## Description
+- **[Purchase with love](https://www.udemy.com/course/nestjs-complete-course/?couponCode=CODEWITHLARI)** — 50% off
+- Or the [full course here](https://www.udemy.com/course/nestjs-complete-course/?referralCode=2164FFED884D2E1A4CE3)
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## Prerequisites
 
-## Project setup
+- Node.js 22+
+- PostgreSQL
+- Redis (Upstash or any Redis instance — used by BullMQ)
 
-```bash
-$ npm install
-```
+## Branches
 
-## Compile and run the project
+Each section of the course has its own branch. Start from the section you are on:
 
-```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
-```
-
-## Run tests
+| Branch | Section |
+| --- | --- |
+| `section-02-core-building-blocks` | Core building blocks |
+| `section-03-request-lifecycle` | Request lifecycle |
+| `section-04-application-lifecycle` | Application lifecycle |
+| `section-05-configuration-architecture` | Configuration |
+| `section-06-postgresql-drizzle` | PostgreSQL + Drizzle |
+| `section-07-rest-api-design` | REST API design |
+| `section-08-authentication-authorization` | Auth |
+| `section-09-main-application` | Main application |
+| `section-10-events-queues-scheduling` | Events, queues, scheduling |
+| `section-11-websockets-realtime` | WebSockets |
+| `section-12-testing-docker-deployment` | Testing + Docker |
+| `section-13-angular-cors` | Angular CORS |
+| `main` | Full completed app |
 
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+git checkout section-06-postgresql-drizzle
 ```
 
-## Deployment
-
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+## 1. Install
 
 ```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+npm install
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+## 2. Environment variables
 
-## Observability
+Copy the example file and fill in your values:
 
-In production applications, observability is essential for understanding how your system behaves, detecting issues early, and maintaining reliable performance.
+```bash
+cp .env.example .env
+```
 
-[NestJS Observe](https://observe.nestjs.com) automatically instruments your NestJS application, giving you deep visibility into your system with minimal setup:
+| Variable | Required | Description |
+| --- | --- | --- |
+| `PORT` | no | App port (default `3000`) |
+| `APP_NAME` | no | Display name in logs |
+| `TASK_DEFAULT_STATUS` | no | `todo` or `done` |
+| `MAIL_FROM` | yes | Valid email used by the mailer |
+| `DATABASE_URL` | yes | PostgreSQL connection URL |
+| `JWT_ACCESS_SECRET` | yes | Secret for access tokens (**min 64 chars**) |
+| `UPSTASH_REDIS_HOST` | yes | Redis host |
+| `UPSTASH_REDIS_PORT` | no | Redis port (default `6379`) |
+| `UPSTASH_REDIS_PASSWORD` | yes | Redis password |
 
-- **Distributed tracing:** Follow requests across services and understand how they flow through your system.
-- **Waterfall analysis:** Visualize request execution and identify slow operations, bottlenecks, and unexpected delays.
-- **Performance analysis:** Analyze application performance in real time and quickly pinpoint areas that need optimization.
-- **Metrics:** Track key application and infrastructure metrics to understand system health and performance trends.
-- **Logging:** Centralize and correlate logs with traces and other telemetry to make debugging easier.
-- **Error tracking:** Detect errors quickly and investigate their root causes with the surrounding context.
-- **SLA monitoring:** Track service-level objectives and identify when your application is approaching or exceeding defined thresholds.
-- **Alarms and alerts:** Set up alerts for critical errors, performance degradation, SLA violations, and other anomalies so your team can react quickly.
+Example `DATABASE_URL`:
 
-## Resources
+```env
+DATABASE_URL=postgresql://postgres:postgres@localhost:5432/project_manager
+```
 
-Check out a few resources that may come in handy when working with NestJS:
+The app validates these on boot via Zod (`src/config/validate-env.ts`). If something is missing or invalid, it fails fast with a clear error.
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Auto-instrument your application with [NestJS Observer](https://observer.nestjs.com). Distributed tracing, metrics, and logging made easy. Error tracking and performance monitoring for your NestJS applications.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+## 3. Database migrations
 
-## Support
+Migrations live in `drizzle/` and are managed with Drizzle Kit.
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+```bash
+# Apply existing migrations to your database
+npm run db:migrate
 
-## Stay in touch
+# After changing src/database/schema.ts — generate a new migration
+npm run db:generate
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+# Optional: open Drizzle Studio
+npm run db:studio
+```
+
+**Order that matters:** set `DATABASE_URL` in `.env` → run `db:migrate` → then start the app.
+
+## 4. Seed (optional)
+
+```bash
+npm run db:seed
+```
+
+Inserts a couple of sample tasks.
+
+## 5. Run the API
+
+```bash
+# watch mode (recommended while learning)
+npm run start:dev
+
+# one-shot
+npm run start
+
+# production build + run
+npm run build
+npm run start:prod
+```
+
+Once running:
+
+- API: `http://localhost:3000`
+- Swagger docs: `http://localhost:3000/docs`
+
+## Tests
+
+```bash
+npm run test        # unit
+npm run test:e2e    # e2e
+npm run test:cov    # coverage
+```
+
+## Docker
+
+```bash
+docker build -t project-manager-api .
+docker run --env-file .env -p 3000:3000 project-manager-api
+```
+
+Make sure Postgres and Redis are reachable from the container (use hostnames your container can resolve — not `localhost` unless you network them correctly).
 
 ## License
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+MIT
